@@ -1,0 +1,128 @@
+---
+import { parseVideo, platformLabel } from '~/lib/video';
+
+interface VideoEntry {
+  url: string;
+  title: string;
+  thumbnail?: string;
+}
+
+interface Props {
+  videos: VideoEntry[];
+}
+
+const { videos } = Astro.props;
+
+const enriched = videos.map((v) => {
+  const parsed = parseVideo(v.url);
+  return {
+    ...v,
+    platform: parsed.platform,
+    thumbnailUrl: v.thumbnail ?? parsed.thumbnailUrl,
+  };
+});
+---
+
+{
+  enriched.length > 0 && (
+    <section class="videos">
+      <h2>Video</h2>
+      <div class="videos-grid">
+        {enriched.map((video) => (
+          <a class="video-card" href={video.url} target="_blank" rel="noopener noreferrer">
+            <div class="video-thumb">
+              {video.thumbnailUrl ? (
+                <img src={video.thumbnailUrl} alt="" loading="lazy" />
+              ) : (
+                <div class="video-thumb-placeholder" aria-hidden="true">
+                  <span>{platformLabel(video.platform)}</span>
+                </div>
+              )}
+              <div class="video-platform" aria-hidden="true">
+                {platformLabel(video.platform)}
+              </div>
+            </div>
+            <div class="video-meta">
+              <span class="video-title">{video.title}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .videos {
+    margin-top: var(--space-6);
+  }
+
+  .videos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+  }
+
+  .video-card {
+    display: block;
+    text-decoration: none;
+    color: var(--color-text);
+    transition: transform 0.15s ease;
+  }
+
+  .video-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .video-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--color-bg-alt);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .video-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+    font-size: 1rem;
+  }
+
+  .video-platform {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    background: rgba(45, 42, 38, 0.85);
+    color: var(--color-bg);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .video-meta {
+    margin-top: var(--space-2);
+  }
+
+  .video-title {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .video-card:hover .video-title {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,215 @@
+---
+interface GalleryImage {
+  src: string;
+  alt: string;
+  credit?: string;
+}
+
+interface Props {
+  images: GalleryImage[];
+}
+
+const { images } = Astro.props;
+
+// Unique ID prefix so multiple galleries on a page don't collide.
+const galleryId = `gallery-${Math.random().toString(36).slice(2, 10)}`;
+---
+
+{
+  images.length > 0 && (
+    <section class="gallery">
+      <h2>Gallery</h2>
+      <div class="gallery-grid">
+        {images.map((image, i) => (
+          <figure class="gallery-item">
+            <button
+              type="button"
+              class="gallery-trigger"
+              data-modal-target={`${galleryId}-${i}`}
+              aria-label={`View larger: ${image.alt}`}
+            >
+              <img src={image.src} alt={image.alt} loading="lazy" />
+            </button>
+            <figcaption>
+              <span class="caption-alt">{image.alt}</span>
+              {image.credit && <span class="caption-credit">{image.credit}</span>}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      {images.map((image, i) => (
+        <dialog id={`${galleryId}-${i}`} class="image-modal">
+          <button type="button" class="modal-close" aria-label="Close">
+            ×
+          </button>
+          <img src={image.src} alt={image.alt} />
+          <p class="modal-alt">{image.alt}</p>
+          {image.credit && <p class="modal-credit">{image.credit}</p>}
+        </dialog>
+      ))}
+    </section>
+  )
+}
+
+<script>
+  // Open the matching dialog when a gallery thumbnail is clicked.
+  document.querySelectorAll<HTMLButtonElement>('[data-modal-target]').forEach((button) => {
+    const targetId = button.dataset.modalTarget;
+    if (!targetId) return;
+    const dialog = document.getElementById(targetId) as HTMLDialogElement | null;
+    if (!dialog) return;
+    button.addEventListener('click', () => dialog.showModal());
+  });
+
+  // Close on the explicit close button or by clicking the backdrop.
+  document.querySelectorAll<HTMLDialogElement>('.image-modal').forEach((dialog) => {
+    dialog.querySelector('.modal-close')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  });
+</script>
+
+<style>
+  .gallery {
+    margin-top: var(--space-6);
+  }
+
+  /* Masonry-style layout: CSS multi-column preserves each image's natural
+     aspect ratio while still tiling them cleanly. */
+  .gallery-grid {
+    column-count: 3;
+    column-gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  @media (max-width: 800px) {
+    .gallery-grid {
+      column-count: 2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .gallery-grid {
+      column-count: 1;
+    }
+  }
+
+  .gallery-item {
+    break-inside: avoid;
+    margin: 0 0 var(--space-3) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .gallery-trigger {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    width: 100%;
+  }
+
+  .gallery-trigger img {
+    width: 100%;
+    height: auto;
+    background: var(--color-bg-alt);
+    border-radius: 2px;
+    transition: transform 0.15s ease;
+  }
+
+  .gallery-trigger:hover img {
+    transform: scale(1.01);
+  }
+
+  .gallery-item figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .caption-alt {
+    color: var(--color-text);
+  }
+
+  .caption-credit {
+    font-style: italic;
+  }
+
+  /* Modal — the dialog fills the viewport and centers its content via flex.
+     This is more reliable than the dialog's default centering when the image
+     is much smaller than the viewport. */
+  .image-modal {
+    border: none;
+    padding: 0;
+    background: transparent;
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    color: var(--color-bg);
+    overflow: hidden;
+  }
+
+  .image-modal[open] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .image-modal::backdrop {
+    background: rgba(0, 0, 0, 0.85);
+  }
+
+  .image-modal img {
+    display: block;
+    max-width: 90vw;
+    max-height: 85vh;
+    width: auto;
+    height: auto;
+  }
+
+  .modal-close {
+    position: fixed;
+    top: var(--space-3);
+    right: var(--space-3);
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--color-text);
+    border: 0;
+    font-size: 1.75rem;
+    line-height: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+
+  .modal-alt {
+    color: var(--color-bg);
+    text-align: center;
+    margin: var(--space-3) 0 0 0;
+    font-size: 0.95rem;
+    max-width: 90vw;
+  }
+
+  .modal-credit {
+    color: rgba(250, 248, 243, 0.7);
+    text-align: center;
+    margin: 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    max-width: 90vw;
+  }
+</style>
