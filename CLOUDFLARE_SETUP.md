@@ -29,6 +29,8 @@ Cloudflare Pages will:
 4. Select the `willwheelermusic.com` repository
 5. Click **Begin setup**
 
+> **Important:** Make sure you choose **Pages** (not Workers) in the create flow. If you accidentally create a Worker, you'll see "Hello World!" at your deploy URL instead of your site, and you'll need to delete and recreate the project.
+
 ---
 
 ## Step 2 — Configure build settings
@@ -41,17 +43,7 @@ On the build configuration screen, enter:
 | Production branch | `main` |
 | Framework preset | **Astro** (Cloudflare auto-detects this) |
 | Build command | `npm run build` |
-| Deploy command | *(leave empty)* — Cloudflare auto-publishes the build output for static sites |
-
-The build output directory is configured via `wrangler.toml` in the repo root:
-
-```toml
-name = "willwheelermusic"
-compatibility_date = "2025-05-01"
-pages_build_output_dir = "./dist"
-```
-
-(Older Cloudflare Pages dashboards had a "Build output directory" field; the newer Workers Builds interface reads it from `wrangler.toml` instead.)
+| Build output directory | `dist` |
 | Root directory | (leave blank — defaults to repo root) |
 
 ### Environment variables (build-time)
@@ -86,12 +78,13 @@ If the build fails, click into the failed run for full logs. The most common iss
 
 ## Step 4 — Set up the custom domain
 
-In the Pages project dashboard:
+In the Workers & Pages dashboard:
 
-1. Click the **Custom domains** tab
-2. Click **Set up a custom domain**
-3. Enter `willwheelermusic.com` → click **Continue**
-4. Cloudflare will then walk you through one of two paths:
+1. Click into your `willwheelermusic` project
+2. Click the **Custom domains** tab
+3. Click **Set up a custom domain**
+4. Enter `willwheelermusic.com` → click **Continue**
+5. Cloudflare will then walk you through one of two paths:
 
 ### Path A — Domain already on Cloudflare DNS
 
