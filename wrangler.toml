@@ -1,0 +1,7 @@
+# Cloudflare Pages config for the willwheelermusic.com static site.
+# Adjust `name` if your Pages project is named something different — it must
+# match the project name shown in the Cloudflare dashboard.
+
+name = "willwheelermusic"
+compatibility_date = "2025-05-01"
+pages_build_output_dir = "./dist"

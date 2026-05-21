@@ -41,7 +41,17 @@ On the build configuration screen, enter:
 | Production branch | `main` |
 | Framework preset | **Astro** (Cloudflare auto-detects this) |
 | Build command | `npm run build` |
-| Build output directory | `dist` |
+| Deploy command | *(leave empty)* — Cloudflare auto-publishes the build output for static sites |
+
+The build output directory is configured via `wrangler.toml` in the repo root:
+
+```toml
+name = "willwheelermusic"
+compatibility_date = "2025-05-01"
+pages_build_output_dir = "./dist"
+```
+
+(Older Cloudflare Pages dashboards had a "Build output directory" field; the newer Workers Builds interface reads it from `wrangler.toml` instead.)
 | Root directory | (leave blank — defaults to repo root) |
 
 ### Environment variables (build-time)
