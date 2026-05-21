@@ -1,0 +1,27 @@
+name: Trigger nightly Cloudflare Pages build
+
+# Cloudflare Pages auto-builds on every push to main. This workflow triggers
+# an additional build once a day so that calendar updates flow into the site
+# without needing a code push.
+#
+# The CLOUDFLARE_DEPLOY_HOOK secret is the unique URL Cloudflare provides under
+# Pages → Settings → Builds & deployments → Deploy hooks. Treat as a secret —
+# anyone with the URL can trigger your builds.
+
+on:
+  schedule:
+    # 9:00 AM UTC daily.
+    # GitHub Actions cron is fixed to UTC and ignores DST, so this translates to:
+    #   - 2:00 AM Pacific during PDT (Mar–Nov, ~8 months/year)
+    #   - 1:00 AM Pacific during PST (Nov–Mar, ~4 months/year)
+    # GitHub may also delay scheduled runs by up to an hour during high load.
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cloudflare deploy hook
+        run: |
+          curl -fsS -X POST "${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}"
