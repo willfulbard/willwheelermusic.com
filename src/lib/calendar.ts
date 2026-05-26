@@ -111,6 +111,36 @@ const HORIZON_MS = 365 * 24 * 60 * 60 * 1000; // one year
 // fallback.
 const DEFAULT_TZ = 'America/Los_Angeles';
 
+// Fetch retry config. If Google's iCal endpoint is briefly unreachable mid-build,
+// we want to try again before giving up. If all attempts fail we throw so the
+// build fails loudly instead of silently shipping an empty events list.
+const MAX_FETCH_ATTEMPTS = 3;
+const RETRY_BASE_DELAY_MS = 1000;
+
+async function fetchCalendarWithRetry() {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
+    try {
+      return await ical.async.fromURL(ICAL_URL);
+    } catch (e) {
+      lastError = e;
+      const message = e instanceof Error ? e.message : String(e);
+      console.warn(
+        `[calendar] Fetch attempt ${attempt}/${MAX_FETCH_ATTEMPTS} failed: ${message}`
+      );
+      if (attempt < MAX_FETCH_ATTEMPTS) {
+        // Linear backoff: 1s, 2s before the 2nd and 3rd attempts.
+        await new Promise((resolve) => setTimeout(resolve, RETRY_BASE_DELAY_MS * attempt));
+      }
+    }
+  }
+  throw new Error(
+    `[calendar] Failed to fetch iCal feed after ${MAX_FETCH_ATTEMPTS} attempts: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`
+  );
+}
+
 /**
  * Returns the offset of `tz` from UTC at the given moment, in milliseconds.
  * Negative for timezones behind UTC (e.g. -25200000 for PDT).
@@ -150,47 +180,42 @@ function adjustRRuleOccurrence(rruleDate: Date, tz: string): Date {
 }
 
 export async function getUpcomingEvents(): Promise<PublicEvent[]> {
-  try {
-    const projects = await getCollection('projects');
-    const validSlugs = new Set(projects.map((p) => p.slug));
+  const projects = await getCollection('projects');
+  const validSlugs = new Set(projects.map((p) => p.slug));
 
-    const data = await ical.async.fromURL(ICAL_URL);
-    const now = new Date();
+  // If this throws after all retries, the build will fail — that's intentional.
+  const data = await fetchCalendarWithRetry();
+  const now = new Date();
 
-    const events: PublicEvent[] = [];
+  const events: PublicEvent[] = [];
 
-    for (const item of Object.values(data)) {
-      if (item.type !== 'VEVENT') continue;
-      const event = item as VEvent;
-      if (!event.start) continue;
+  for (const item of Object.values(data)) {
+    if (item.type !== 'VEVENT') continue;
+    const event = item as VEvent;
+    if (!event.start) continue;
 
-      let description: string | undefined = event.description ?? undefined;
-      let projectSlug: string | undefined;
-      let descriptionIsHtml = false;
-      if (description) {
-        const parsed = extractProjectSlug(description, validSlugs);
-        description = parsed.description || undefined;
-        projectSlug = parsed.slug;
-        descriptionIsHtml = description ? isHtml(description) : false;
-      }
-
-      for (const occ of getOccurrences(event, now)) {
-        events.push({
-          title: event.summary ?? 'Untitled event',
-          description,
-          descriptionIsHtml,
-          location: event.location ?? undefined,
-          start: occ.start.toISOString(),
-          end: occ.end.toISOString(),
-          projectSlug,
-        });
-      }
+    let description: string | undefined = event.description ?? undefined;
+    let projectSlug: string | undefined;
+    let descriptionIsHtml = false;
+    if (description) {
+      const parsed = extractProjectSlug(description, validSlugs);
+      description = parsed.description || undefined;
+      projectSlug = parsed.slug;
+      descriptionIsHtml = description ? isHtml(description) : false;
     }
 
-    return events.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
-  } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
-    console.warn(`[calendar] Failed to fetch events: ${message}`);
-    return [];
+    for (const occ of getOccurrences(event, now)) {
+      events.push({
+        title: event.summary ?? 'Untitled event',
+        description,
+        descriptionIsHtml,
+        location: event.location ?? undefined,
+        start: occ.start.toISOString(),
+        end: occ.end.toISOString(),
+        projectSlug,
+      });
+    }
   }
+
+  return events.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 }
