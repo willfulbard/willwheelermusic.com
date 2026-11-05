@@ -103,6 +103,11 @@ function extractProjectSlug(
 const ICAL_URL =
   'https://calendar.google.com/calendar/ical/904ea4233f384e6202a9817c4a9a47bb5faca3fc1391d0361f0d6d1e57bcf242%40group.calendar.google.com/public/basic.ics';
 
+// Human-facing link to the same calendar. Opening it in a browser lets a visitor
+// view the calendar on Google and add it to their own Google Calendar.
+export const CALENDAR_PUBLIC_URL =
+  'https://calendar.google.com/calendar/u/0?cid=OTA0ZWE0MjMzZjM4NGU2MjAyYTk4MTdjNGE5YTQ3YmI1ZmFjYTNmYzEzOTFkMDM2MWYwZDZkMWU1N2JjZjI0MkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t';
+
 const RECURRING_MAX = 4;
 const HORIZON_MS = 365 * 24 * 60 * 60 * 1000; // one year
 
