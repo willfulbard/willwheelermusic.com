@@ -4,65 +4,44 @@ Outstanding items for willwheelermusic.com.
 
 ## Content
 
-### Hero & photos
-- [ ] Add project photos for each of the 7 projects (set the `hero` field in each `src/content/projects/*.md`)
-- [ ] Collect photographer credits for any photos used
-
 ### Project descriptions
+
 - [ ] Refine description in `src/content/projects/forgery.md`
 - [ ] Refine description in `src/content/projects/dance-dinos.md`
 - [ ] Refine description in `src/content/projects/punch-party.md`
-- [ ] Refine description in `src/content/projects/the-flagstones.md` (and confirm if it's a trio or quartet — currently lists 3 members but labeled quartet)
+- [ ] Refine description in `src/content/projects/the-flagstones.md` (and reconcile frontmatter `ensemble: Trio` with body text calling it a "quartet")
 - [ ] Refine description in `src/content/projects/will-and-holly.md`
 - [ ] Refine description in `src/content/projects/yellowfoot.md`
-- [ ] Refine description in `src/content/projects/starry-plough-ceili-band.md` (and confirm full lineup)
+- [ ] Refine description in `src/content/projects/starry-plough-ceili-band.md`
 
-## Operational setup
+### Photos
 
-### Google Calendar integration
-- ✅ Public calendar created and URL hardcoded in `src/lib/calendar.ts`
-- [ ] Add upcoming gigs to the calendar
-- [ ] Trigger a manual rebuild to verify events render
-- [ ] Important: every event on this calendar appears publicly on the site — keep private notes (pay, contact, etc.) on a separate calendar
+- [ ] Add hero photo for **Will and Holly** (frontmatter still says `# TODO: add photo`)
+- [ ] Add hero photo for **Punch Party** (frontmatter still says `# TODO: add photo`)
+- [ ] Collect photographer credits for any photos used
 
-### Hosting
-Choose one path:
+## Operational
 
-**Path A — Self-hosted**
-- [ ] Choose self-hosted environment (VPS, home server, etc.)
-- [ ] Configure server to pull from the `deploy` branch (cron-based git fetch every 5 minutes recommended)
-- [ ] Configure DNS A/AAAA records for `willwheelermusic.com` and `www.willwheelermusic.com` to point to the server
-- [ ] Set up TLS — Caddy is simplest (auto-provisions Let's Encrypt certs); nginx + certbot also fine
-- [ ] Verify site loads correctly at https://willwheelermusic.com/
+### Calendar (ongoing)
 
-**Path B — Cloudflare Pages**
-- [ ] Sign up at [pages.cloudflare.com](https://pages.cloudflare.com) (free)
-- [ ] Connect GitHub account, select `willwheelermusic.com` repo
-- [ ] Set build command: `npm run build`, output directory: `dist`
-- [ ] Add environment variables (`GOOGLE_CALENDAR_CREDENTIALS` and `GOOGLE_CALENDAR_ID`) once Calendar is set up
-- [ ] Verify auto-deploy works on push to `main`
-- [ ] Configure custom domain `willwheelermusic.com` in Cloudflare Pages settings
-- [ ] Update DNS to Cloudflare nameservers (or add CNAME records if using a different registrar)
-
-### GitHub Pages preview (optional)
-- [ ] Decide: leave the GH Pages URL (https://willfulbard.github.io/willwheelermusic.com/) as build-verification only, or fix the base path so it works as a true preview
-  - Note: paths break on GH Pages because the site is configured for root `/`, not `/willwheelermusic.com/`
-  - Cloudflare Pages would solve this automatically (it serves at root)
+- [ ] Add upcoming gigs to the public Google Calendar as they're booked
+- ⚠️ Reminder: every event on this calendar appears publicly on the site — keep private notes (pay, contact, etc.) on a separate calendar
 
 ## Design refinement (lower priority)
 
-- [ ] Review color palette once real photos are in place — accent color may want to be drawn from photography
+- [ ] Review color palette once more real photos are in place — accent color may want to be drawn from photography
 - [ ] Confirm font choices (currently Lora + Source Sans 3); swap if they don't feel right
 - [ ] Mobile testing pass once content is filled in
 
 ## Future phases (not scoped now)
 
 ### Phase 2 — Enrichment
-- [ ] Media gallery page (photos + videos)
+
 - [ ] EPK page (short bios, high-res photos, tech rider, press quotes)
 - [ ] Bandsintown integration (alternative to Google Calendar if it becomes useful)
 
 ### Phase 3 — Optional growth
+
 - [ ] Teaching/lessons page (when offering them)
 - [ ] Music/Discography page (when there are recordings)
 - [ ] Blog (tune of the week, session notes, travel writing)
@@ -70,19 +49,18 @@ Choose one path:
 
 ## Resolved
 
-These were decided earlier in the planning process — keeping for reference:
+Major decisions and milestones for reference:
 
 - ✅ Tagline: "Living music from old roots"
 - ✅ Tech stack: Astro
-- ✅ Hosting: self-hosted, deployed via GitHub Actions to the `deploy` orphan branch
 - ✅ Domain: willwheelermusic.com
+- ✅ Hosting: Cloudflare Pages with nightly cron rebuild via GitHub Actions
 - ✅ Newsletter: not doing one (Instagram for gig updates)
 - ✅ Lark Camp / Starry Plough: mentioned in About bio, no dedicated section
-- ✅ Contact form: FormSubmit with hashed endpoint
-- ✅ Thank-you page after form submission
-- ✅ About section written
-- ✅ All 7 project stubs created
-- ✅ GitHub repo created and pushed
-- ✅ GitHub Actions building successfully
-- ✅ `deploy` branch publishing
-- ✅ GitHub Pages preview enabled
+- ✅ Contact form: FormSubmit with hashed endpoint, FormSubmit-handled thank-you redirect
+- ✅ About page written, with side-image stack and gallery/videos infrastructure
+- ✅ All 7 project pages stubbed; cover-style hero on each
+- ✅ Calendar integration: public Google Calendar, fetched at build with 3-attempt retry, build fails on total failure
+- ✅ Recurring events expanded to next 4 occurrences with correct timezone handling
+- ✅ Project-slug links in event descriptions
+- ✅ Click-to-zoom gallery modal
