@@ -13,6 +13,7 @@ members:
   - name: Ben Saylor
     instruments: [flute]
 hero: /images/projects/yellowfoot/gallery/10223.jpg
+heroPosition: center top
 gallery:
   - src: /images/projects/yellowfoot/gallery/duo-bar.jpg
     alt: Playing the local Irish setdance

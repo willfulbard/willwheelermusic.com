@@ -16,6 +16,9 @@ const projects = defineCollection({
       })
     ),
     hero: z.string().nullable().optional(),
+    // CSS background-position for the hero cover crop (e.g. "center top",
+    // "center 15%"). Defaults to "center 25%" when omitted.
+    heroPosition: z.string().optional(),
     links: z
       .object({
         bandcamp: z.string().url().optional(),

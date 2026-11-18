@@ -18,7 +18,8 @@ interface Props {
 
 const { project } = Astro.props;
 const { Content } = await project.render();
-const { name, style, ensemble, members, hero, links, gallery, videos } = project.data;
+const { name, style, ensemble, members, hero, heroPosition, links, gallery, videos } =
+  project.data;
 ---
 
 <BaseLayout title={name}>
@@ -27,7 +28,7 @@ const { name, style, ensemble, members, hero, links, gallery, videos } = project
       hero && (
         <div
           class="project-cover-image"
-          style={`background-image: url(${hero})`}
+          style={`background-image: url(${hero}); background-position: ${heroPosition ?? 'center 25%'}`}
           aria-hidden="true"
         />
       )
