@@ -4,6 +4,46 @@ import EventList from '~/components/EventList.astro';
 import { getUpcomingEvents, CALENDAR_PUBLIC_URL } from '~/lib/calendar';
 
 const events = await getUpcomingEvents();
+
+// Regular dances, sessions, and events Will plays for, with links to each
+// series. Add or edit entries as the regular schedule changes.
+const regularPlaces: { name: string; venue: string; url: string }[] = [
+  {
+    name: 'Monday Night Irish Céilí',
+    venue: 'The Starry Plough, Berkeley',
+    url: 'https://thestarryplough.com/monday-ceili-irish-dance/',
+  },
+  {
+    name: 'Berkeley Contra Dance',
+    venue: 'Christ Church East Bay, Berkeley (BACDS)',
+    url: 'https://bacds.org/series/contra/berkeley_wed/',
+  },
+  {
+    name: 'San Francisco Contra Dance',
+    venue: 'The Polish Club, San Francisco (BACDS)',
+    url: 'https://bacds.org/series/contra/san_francisco/',
+  },
+  {
+    name: 'Palo Alto Contra Dance',
+    venue: 'First United Methodist Church, Palo Alto',
+    url: 'https://paloaltocontradance.org/',
+  },
+  {
+    name: 'Hayward Contra Dance',
+    venue: 'Hill & Valley Club, Hayward (SF Bay Contra)',
+    url: 'https://sfbaycontra.org/',
+  },
+  {
+    name: 'Circle Left',
+    venue: 'Lake Merritt, Oakland (Queer Contra Dance)',
+    url: 'https://queercontradance.org/circleleft.html',
+  },
+  {
+    name: 'Lark Camp',
+    venue: 'Mendocino — annual world music & dance camp',
+    url: 'https://www.larkcamp.org',
+  },
+];
 ---
 
 <BaseLayout title="Events">
@@ -18,6 +58,25 @@ const events = await getUpcomingEvents();
       </a>
     </p>
     <EventList events={events} />
+
+    <section class="regular-places">
+      <h2>Places you can often find me</h2>
+      <p class="places-intro">
+        Beyond one-off gigs, these are the regular dances and sessions I play for:
+      </p>
+      <ul class="places-list">
+        {
+          regularPlaces.map((place) => (
+            <li class="place">
+              <a href={place.url} target="_blank" rel="noopener noreferrer" class="place-name">
+                {place.name}
+              </a>
+              <span class="place-venue">{place.venue}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
   </section>
 </BaseLayout>
 
@@ -36,5 +95,45 @@ const events = await getUpcomingEvents();
   .calendar-link {
     font-size: 0.95rem;
     margin-bottom: var(--space-5);
+  }
+
+  .regular-places {
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .places-intro {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .places-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .place {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .place:last-child {
+    border-bottom: none;
+  }
+
+  .place-name {
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+  }
+
+  .place-venue {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
   }
 </style>
